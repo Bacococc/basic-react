@@ -1,35 +1,58 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import type { Post } from './types/Post'
+import { BASE_API_URL } from './apis/baseUrl'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
+  
+  const handleFindAll = async () => {
+    setLoading(true);
+    setMessage('로딩 중...');
+
+    try {
+      const response = await fetch(BASE_API_URL);
+      const result = await response.json();
+      if(!response.ok) throw new Error(result.message || '불러오기에 실패했습니다.');
+
+      setPosts(result.data);
+      setMessage(result.message);
+    } catch (error: any) {
+      setMessage(`오류 발생: ${error.message}`);
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
+    <div>
+      <h1>API 테스트</h1>
+      <strong>{message}</strong>
+    </div>
+
+    {/*GET 테스트*/}
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h2>모든 글 검색하기</h2>
+        { posts.length < 0 ? (
+          <strong>표시할 게시물이 없습니다.</strong>
+        ) : ( 
+        <ul>
+          {posts.map((p) => ( 
+            <li key={p.id}>{p.title}
+              <p>{p.content}</p>
+            </li>
+          ))}
+        </ul>
+        )}
+        <button onClick={handleFindAll} disabled={loading}>검색</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
+
 
 export default App
