@@ -23,7 +23,7 @@ const App: React.FC = () => {
 
       // setPosts(result.data); 
       setPosts(result); //json-server로 연습하는 중이라 이렇게 처리
-      setMessage(result.message); //message는 일단 두기...
+      setMessage(result.message); //message도 json-server 써서 없는 필드이지만 일단 두기...
     } catch (error: any) {
       setMessage(`오류 발생: ${error.message}`);
       setPosts([]);
